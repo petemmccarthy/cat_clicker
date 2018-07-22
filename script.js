@@ -1,36 +1,113 @@
-let cats = ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'];
-let i;
-
-for(i = 0; i <cats.length; i++) {
-
-  let myCat = {
-    name: cats[i],
-    clickCount: 0,
-    image: "images/" + cats[i] + ".jpeg"
-  };
-
-  let elem = document.createElement('ul');
-  elem.textContent = myCat.name;
-  elem.className = "inline";
-  let catList = document.getElementById('catList');
-  catList.appendChild(elem);
-
-
-  let catNameElem = document.getElementById('catName');
-  let clickCountElem = document.getElementById('clickCount');
-  let catImageElem = document.getElementById('catImage');
-
-  elem.addEventListener('click', (function(selectedCat) {
-    return function() {
-
-      myCat.clickCount += 1;
-
-      catNameElem.textContent = myCat.name;
-
-      catImageElem.src = myCat.image;
-
-      clickCountElem.textContent = myCat.clickCount;
+const model = {
+  currentCat: null,
+  cats: [
+    {
+      name: 'cat1',
+      clickCount: 0,
+      image: "images/cat1.jpeg"
+    },
+    {
+      name: 'cat2',
+      clickCount: 0,
+      image: "images/cat2.jpeg"
+    },
+    {
+      name: 'cat3',
+      clickCount: 0,
+      image: "images/cat3.jpeg"
+    },
+    {
+      name: 'cat4',
+      clickCount: 0,
+      image: "images/cat4.jpeg"
+    },
+    {
+      name: 'cat5',
+      clickCount: 0,
+      image: "images/cat5.jpeg"
     }
-  })(myCat));
+  ]
+}
 
-};
+const controller = {
+
+  init() {
+    model.currentCat = model.cats[0]
+    catListView.init()
+    catDetailView.init()
+  },
+
+  getAllCats() {
+    return model.cats
+  },
+
+  getCurrentCat() {
+    return model.currentCat
+  },
+
+  setCurrentCat(selectedCat) {
+    model.currentCat = selectedCat
+  },
+
+  incrementCounter() {
+    model.currentCat.clickCount++
+    catDetailView.render()
+  }
+
+}
+
+const catListView = {
+
+  init() {
+    this.catListElem = document.getElementById('catList')
+    this.render()
+  },
+
+  render() {
+    let i, cats, catElem
+
+    cats = controller.getAllCats()
+
+    for (i = 0; i < cats.length; i++) {
+      cat = cats[i]
+
+      catElem = document.createElement('li')
+      catElem.textContent = cat.name
+
+      catElem.addEventListener('click', (function(selectedCat) {
+        return function() {
+          controller.setCurrentCat(selectedCat)
+          catDetailView.render()
+        }
+      })(cat))
+
+      this.catListElem.appendChild(catElem)
+    }
+  }
+
+}
+
+const catDetailView = {
+
+  init() {
+    this.catNameElem = document.getElementById('catName')
+    this.catCountElem = document.getElementById('clickCount')
+    this.catImageElem = document.getElementById('catImage')
+
+    this.catImageElem.addEventListener('click', function() {
+      controller.incrementCounter()
+    })
+
+    this.render()
+  },
+
+  render() {
+    let currentCat = controller.getCurrentCat()
+    this.catNameElem.textContent = currentCat.name
+    this.catCountElem.textContent = currentCat.clickCount
+    this.catImageElem.src = currentCat.image
+  }
+
+}
+
+controller.init()
