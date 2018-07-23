@@ -1,5 +1,6 @@
 const model = {
   currentCat: null,
+  displayAdminField: false,
   cats: [
     {
       name: 'cat1',
@@ -35,6 +36,7 @@ const controller = {
     model.currentCat = model.cats[0]
     catListView.init()
     catDetailView.init()
+    adminFormView.init()
   },
 
   getAllCats() {
@@ -47,11 +49,29 @@ const controller = {
 
   setCurrentCat(selectedCat) {
     model.currentCat = selectedCat
+    adminFormView.render()
   },
 
   incrementCounter() {
     model.currentCat.clickCount++
     catDetailView.render()
+  },
+
+  openAdmin() {
+    model.displayAdminField = true
+    adminFormView.render()
+  },
+
+  closeAdmin() {
+    model.displayAdminField = false
+    adminFormView.render()
+  },
+
+  updateCatDetails(newName) {
+    model.currentCat.name = newName
+    catListView.render()
+    catDetailView.render()
+    controller.closeAdmin()
   }
 
 }
@@ -64,8 +84,9 @@ const catListView = {
   },
 
   render() {
-    let i, cats, catElem
+    this.catListElem.innerHTML=""
 
+    let i, cats, catElem
     cats = controller.getAllCats()
 
     for (i = 0; i < cats.length; i++) {
@@ -108,6 +129,45 @@ const catDetailView = {
     this.catImageElem.src = currentCat.image
   }
 
+}
+
+const adminFormView = {
+
+  init() {
+    this.adminButton = document.getElementById('admin')
+    this.saveButton = document.getElementById('save')
+    this.cancelButton = document.getElementById('cancel')
+
+    this.nameInputElem = document.getElementById('catNameField')
+    this.imgInputElem = document.getElementById('imgUrlField')
+    this.clicksInputElem = document.getElementById('clicks')
+
+    this.adminButton.addEventListener('click', function() {
+      model.displayAdminField? controller.closeAdmin() : controller.openAdmin()
+    })
+
+    this.saveButton.addEventListener('click', function() {
+      let newName = document.getElementById('catNameField').value
+      controller.updateCatDetails(newName)
+    })
+
+    this.cancelButton.addEventListener('click', function() {
+      controller.closeAdmin()
+    })
+
+    this.render()
+  },
+
+  render() {
+    let currentCat = controller.getCurrentCat()
+
+    this.nameInputElem.value = currentCat.name
+    this.imgInputElem.value = currentCat.image
+    this.clicksInputElem.value = currentCat.clickCount
+
+    this.adminForm = document.getElementById('adminForm')
+    model.displayAdminField? this.adminForm.style.display = "block" : this.adminForm.style.display = "none"
+  }
 }
 
 controller.init()

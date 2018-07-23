@@ -5,3 +5,9 @@
 .inline {
   display: inline-block;
 }
+
+img {
+  width: 120px;
+  height: 100px;
+  padding-bottom: 10px;
+}
